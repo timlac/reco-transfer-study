@@ -13,7 +13,7 @@ def clean_filename(filename):
 # for p in glob("data/*.mov"):
 #     print(p)
 
-for p in Path("data").glob("*.mov"):
+for p in Path("../data").glob("*.mov"):
 
 
     print(p)

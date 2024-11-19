@@ -12,4 +12,4 @@ def rename_files_in_folder(folder_path):
         print(f'Renamed: {file_path} -> {new_path}')
 
 # Example usage
-rename_files_in_folder("data")
+rename_files_in_folder("../data")

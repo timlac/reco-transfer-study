@@ -5,7 +5,7 @@ import glob
 from pathlib import Path
 import os
 
-folder_path = "data"
+folder_path = "../data"
 box_downloads = Path(folder_path) / "box_downloads"
 original_folder = Path(folder_path) / "original"
 metahuman_folder = Path(folder_path) / "metahuman"

@@ -37,4 +37,4 @@ def move_files_based_on_last_char(folder_path):
         print(f'Moved: {file_path} -> {target_path}')
 
 # Example usage
-move_files_based_on_last_char("data")
+move_files_based_on_last_char("../data")
