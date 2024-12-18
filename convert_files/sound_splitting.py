@@ -8,7 +8,8 @@ furhat_folder = Path(folder_path) / "furhat_converted"
 metahuman_folder = Path(folder_path) / "metahuman_converted"
 original_folder = Path(folder_path) / "original_converted"
 
-folders = {"furhat": furhat_folder, "metahuman": metahuman_folder, "original": original_folder}
+# folders = {"furhat": furhat_folder, "metahuman": metahuman_folder, "original": original_folder}
+folders = {"furhat": furhat_folder}
 
 for condition, folder in folders.items():
     print(f"Processing condition: {condition}")

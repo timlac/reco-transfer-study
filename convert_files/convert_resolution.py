@@ -8,7 +8,8 @@ furhat_folder = Path(folder_path) / "furhat"
 metahuman_folder = Path(folder_path) / "metahuman"
 original_folder = Path(folder_path) / "original"
 
-folders = {"furhat": furhat_folder, "metahuman": metahuman_folder, "original": original_folder}
+# folders = {"furhat": furhat_folder, "metahuman": metahuman_folder, "original": original_folder}
+folders = {"furhat": furhat_folder}
 
 # Create a new folder for each condition
 output_suffix = "_converted"

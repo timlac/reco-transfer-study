@@ -4,7 +4,7 @@ import pandas as pd
 
 from nexa_sentimotion_filename_parser.metadata import Metadata
 
-folder_path = "../data"
+folder_path = "../data/videos"
 
 furhat_folder = Path(folder_path) / "furhat"
 metahuman_folder = Path(folder_path) / "metahuman"
