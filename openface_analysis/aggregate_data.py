@@ -5,7 +5,7 @@ from nexa_sentimotion_filename_parser.metadata import Metadata
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 from nexa_preprocessing.cleaning.openface_data_cleaning import OpenfaceDataCleaner
 
-from constants import AU_INTENSITY_COLS
+from constants import feature_columns
 
 Mapper._load_data_if_needed()
 
@@ -19,6 +19,11 @@ folders = {"furhat": furhat_folder, "metahuman": metahuman_folder, "original": o
 
 data = []
 
+
+def update_row(item, vals, suffix):
+    item.update({f"{col}{suffix}": val for col, val in vals.items()})
+    return item
+
 for condition, folder in folders.items():
     for filename in folder.glob("*.csv"):
         metadata = Metadata(filename.stem)
@@ -27,6 +32,7 @@ for condition, folder in folders.items():
             "filename": filename.stem,
             "video_id": metadata.video_id,
             "emotion": Mapper.get_emotion_from_id(metadata.emotion_1_id),
+            "emotion_id": metadata.emotion_1_id,
             "intensity_level": metadata.intensity_level,
             "mode": metadata.mode,
         }
@@ -37,14 +43,19 @@ for condition, folder in folders.items():
         success_frames = temp_df[temp_df["success"] == 1]
 
         # Calculate mean and variance for action unit columns
-        au_columns_mean = success_frames[AU_INTENSITY_COLS].mean()
-        au_columns_var = success_frames[AU_INTENSITY_COLS].var()
+        means = success_frames[feature_columns].mean()
+        varss = success_frames[feature_columns].var()
+        quantile_20 = success_frames[feature_columns].quantile(0.2)
+        quantile_50 = success_frames[feature_columns].quantile(0.5)
+        quantile_80 = success_frames[feature_columns].quantile(0.8)
+        iqr_values = quantile_80 - quantile_20
 
-        # Add mean values to the row dictionary with '_mean' suffix
-        row.update({f"{col}_mean": mean_val for col, mean_val in au_columns_mean.items()})
-
-        # Add variance values to the row dictionary with '_var' suffix
-        row.update({f"{col}_var": var_val for col, var_val in au_columns_var.items()})
+        update_row(row, means, "_mean")
+        update_row(row, varss, "_var")
+        update_row(row, quantile_20, "_20th")
+        update_row(row, quantile_50, "_50th")
+        update_row(row, quantile_80, "_80th")
+        update_row(row, iqr_values, "_iqr")
 
         data.append(row)
 
