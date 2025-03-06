@@ -2,7 +2,7 @@ import subprocess
 import os
 from pathlib import Path
 
-folder_path = "../data/videos"
+folder_path = "../../data/videos"
 
 furhat_folder = Path(folder_path) / "furhat"
 metahuman_folder = Path(folder_path) / "metahuman"

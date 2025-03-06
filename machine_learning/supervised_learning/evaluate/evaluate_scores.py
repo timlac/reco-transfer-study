@@ -17,8 +17,13 @@ def evaluate_scores(x, y, clf, scoring_method):
                             return_train_score=True
                             )
 
+    validation_score_mean = np.mean(scores['test_{}'.format(scoring_method)])
+    validation_score_std = np.std(scores['test_{}'.format(scoring_method)])
+
     print('\nprinting {} measures'.format(scoring_method))
     print('avg (train):', np.mean(scores['train_{}'.format(scoring_method)]))
     print('std (train):', np.std(scores['train_{}'.format(scoring_method)]))
-    print('avg (validation):', np.mean(scores['test_{}'.format(scoring_method)]))
-    print('std (validation):', np.std(scores['test_{}'.format(scoring_method)]))
+    print('avg (validation):', validation_score_mean)
+    print('std (validation):', validation_score_std)
+
+    return validation_score_mean, validation_score_std

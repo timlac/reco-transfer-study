@@ -1,9 +1,13 @@
-print("hello world")
+import os
 
-my_var = 10
+l = []
 
-print(my_var)
+for f in os.listdir('data/videos/original'):
+    print(os.path.basename(f))
 
-my_var = 20
+    l.append(os.path.splitext(f)[0])
 
-print(my_var)
+print("[")
+for item in l:
+    print(f"  {repr(item)},")
+print("]")

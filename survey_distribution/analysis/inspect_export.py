@@ -2,7 +2,7 @@ import pandas as pd
 import os
 from glob import glob
 
-path = "../data/export"
+path = "../../data/export"
 
 export_glob = glob(path + "/*.csv")
 

@@ -8,7 +8,7 @@ mean_cols = [f"{col}_mean" for col in AU_INTENSITY_COLS]
 var_cols = [f"{col}_var" for col in AU_INTENSITY_COLS]
 
 # Load your CSV file into a DataFrame
-df = pd.read_csv("../data/out/openface_data.csv")
+df = pd.read_csv("../../data/out/openface_data.csv")
 
 # Melt the DataFrame for mean values
 melted_mean_df = df.melt(id_vars=['condition', 'emotion'],
