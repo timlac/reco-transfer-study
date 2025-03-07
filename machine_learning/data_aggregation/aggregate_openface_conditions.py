@@ -6,6 +6,7 @@ from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 from nexa_preprocessing.cleaning.openface_data_cleaning import OpenfaceDataCleaner
 
 from constants import openface_feature_columns, ROOT_DIR
+from machine_learning.data_aggregation.utils import update_row
 
 Mapper._load_data_if_needed()
 
@@ -18,11 +19,6 @@ original_folder = Path(folder_path) / "original"
 folders = {"furhat": furhat_folder, "metahuman": metahuman_folder, "original": original_folder}
 
 data = []
-
-
-def update_row(item, vals, suffix):
-    item.update({f"{col}{suffix}": val for col, val in vals.items()})
-    return item
 
 for condition, folder in folders.items():
     for filename in folder.glob("*.csv"):

@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
+# TODO: Check that is actually works as intended, right now it actually seems to make svm accuracy worse...
 
 def functional_scale_by(x, groups, method):
     """
@@ -18,7 +19,7 @@ def functional_scale_by(x, groups, method):
         else:
             raise RuntimeError("Something went wrong, no scaling method chosen")
 
-        rows = np.where(groups == group)
+        rows = np.where(groups == group)[0]
         x[rows] = scaler.fit_transform(x[rows])
     return x
 
@@ -26,3 +27,5 @@ def functional_scale_by(x, groups, method):
 def get_splits(x, y):
     skf = StratifiedKFold(n_splits=8, shuffle=True, random_state=10)
     return skf.split(x, y)
+
+

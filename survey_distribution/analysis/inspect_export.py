@@ -2,7 +2,9 @@ import pandas as pd
 import os
 from glob import glob
 
-path = "../../data/export"
+from constants import ROOT_DIR
+
+path = os.path.join(ROOT_DIR, "data/export")
 
 export_glob = glob(path + "/*.csv")
 
@@ -17,4 +19,4 @@ df = pd.concat(dataframes, ignore_index=True)
 df["generic_id"] = df["user_id"].str.extract(r"(\d+)$").astype(int)
 
 
-df.to_csv("../data/export/merged_surveys.csv", index=False)
+df.to_csv(os.path.join(ROOT_DIR, "data/export/merged_surveys.csv"), index=False)

@@ -15,7 +15,8 @@ def param_search(x, y, clf, scoring_method, mock=False):
 
             "gamma": [1, 0.5, 0.1, 0.05, 0.01, 0.001, 0.0001],
 
-            "kernel": ['rbf', 'linear', 'poly', 'sigmoid']
+            # TODO: commented out 'linear' because slow
+            "kernel": ['rbf', 'poly', 'sigmoid']
         }
 
     skf = StratifiedKFold(n_splits=5, shuffle=True)
@@ -25,6 +26,7 @@ def param_search(x, y, clf, scoring_method, mock=False):
                       scoring=scoring_method,
                       cv=skf.split(x, y),
                       n_jobs=-1,
+                      verbose=3
                       )
 
     print("running param search")

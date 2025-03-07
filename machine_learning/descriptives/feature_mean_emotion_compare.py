@@ -12,7 +12,7 @@ from constants import AU_INTENSITY_COLS, ROOT_DIR
 # Load your CSV file into a DataFrame
 df_openface = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"))
 
-df = df_openface[df_openface["condition"] == "original"].copy()
+df = df_openface[df_openface["condition"] == "metahuman"].copy()
 
 emotions = df["emotion"]
 emotion_ids = df["emotion_id"]
@@ -23,20 +23,8 @@ print(mean_cols)
 
 df[mean_cols] = StandardScaler().fit_transform(df[mean_cols])
 
-for idx in range(0, len(mean_cols)):
-
-    if idx == 1:
-        continue
-
-    for emotion_id in emotion_ids.unique():
-        df_emotion = df[df["emotion_id"] == emotion_id]
-
-        x, y = df_emotion[mean_cols[idx]], df_emotion[mean_cols[1]]
-        plt.scatter(x, y)
-
-    plt.legend(Mapper.get_emotion_from_id(emotion_ids.unique()), bbox_to_anchor=(1, 0.5))
-    plt.xlabel(mean_cols[idx])
-    plt.ylabel(mean_cols[1])
-    plt.title(f"Scatter plot of {mean_cols[idx]} and {mean_cols[1]}")
-    plt.tight_layout()
+for feature in mean_cols:  # Plot first 5 features as example
+    plt.figure(figsize=(8, 5))
+    sns.kdeplot(data=df, x=feature, hue="emotion", common_norm=False)
+    plt.title(f"Feature Distribution by Emotion: {feature}")
     plt.show()
