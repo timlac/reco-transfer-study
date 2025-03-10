@@ -1,8 +1,10 @@
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
 
 
-def param_search(x, y, clf, scoring_method, mock=False):
+def param_search(x, y, scoring_method, mock=False):
+    clf = SVC()
     if mock:
         parameters = {
             'class_weight': ['balanced'],

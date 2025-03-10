@@ -1,15 +1,24 @@
 import pandas as pd
 import os
+from glob import glob
 
-path = "/home/tim/Downloads/new_export/"
+from constants import ROOT_DIR
 
-# Get all CSV files in the directory
-csv_files = [os.path.join(path, file) for file in os.listdir(path) if file.endswith('.csv')]
+path = os.path.join(ROOT_DIR, "data/export")
 
-# Read and merge all CSV files
-merged_df = pd.concat((pd.read_csv(file) for file in csv_files), ignore_index=True)
+export_glob = glob(path + "/*.csv")
 
-# Show the merged DataFrame
-print(merged_df)
+dataframes = []
 
-merged_df.to_csv("/home/tim/Downloads/new_export/merged_surveys.csv", index=False)
+for file in export_glob:
+    df = pd.read_csv(file)
+    dataframes.append(df)
+
+df = pd.concat(dataframes, ignore_index=True)
+
+df["generic_id"] = df["user_id"].str.extract(r"(\d+)$").astype(int)
+df["condition"] = df["user_id"].str.extract(r"^(.*?)(?=\d*$)")
+df["accurate"] = df["emotion_1_id"] == df["reply"]
+
+
+df.to_csv(os.path.join(ROOT_DIR, "data/export/merged_surveys.csv"), index=False)

@@ -26,21 +26,19 @@ def pipeline(X, y , y_strings, condition):
 
     print(X.shape)  # Number of rows and columns in the scaled feature matrix
 
-    clf = SVC()
-
     # do grid search for best parameters
-    gs = param_search(X, y, clf, "accuracy")
+    gs = param_search(X, y, "accuracy")
 
     svc = SVC(**gs.best_params_)
 
     # evaluate classifier with different scoring methods
-    val_mean_acc, val_std_acc  = evaluate_scores(X, y, svc, "accuracy")
+    mean_acc, std_acc  = evaluate_scores(X, y, svc, "accuracy")
 
     svc_proba = SVC(**gs.best_params_, probability=True)
     # plot_multi_class_auc_curve(svc_proba, X, y)
 
-    evaluate_scores(X, y, svc_proba, "roc_auc_ovr")
-    evaluate_scores(X, y, svc, "f1_macro")
+    mean_auc, std_auc = evaluate_scores(X, y, svc_proba, "roc_auc_ovr")
+    mean_f1, std_f1 = evaluate_scores(X, y, svc, "f1_macro")
 
     # get the predictions using cross validation
     splits = get_splits(X, y)
@@ -57,11 +55,24 @@ def pipeline(X, y , y_strings, condition):
     plot_conf_mat(conf_mat, labels=np.unique(y_strings), condition=condition)
     print(conf_mat)
 
-    return val_mean_acc, val_std_acc
+
+    scores = {
+        "condition": condition,
+        "mean_acc": mean_acc,
+        "std_acc": std_acc,
+        "mean_auc": mean_auc,
+        "std_auc": std_auc,
+        "mean_f1": mean_f1,
+        "std_f1": std_f1
+    }
+
+    return scores
 
 
 def main():
-    acc_scores = []
+    # TODO: try training everything together and evaluate separately
+
+    all_scores = []
 
     df_openface = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"))
     print(df_openface.shape)
@@ -86,10 +97,8 @@ def main():
         print(y.shape)  # Number of rows in the target vector
         print(y_strings.shape)
 
-        val_mean_acc, val_std_acc = pipeline(X, y, y_strings, c)
-
-        scores = {"condition": c, "val_mean_acc": val_mean_acc, "val_std_acc": val_std_acc}
-        acc_scores.append(scores)
+        scores = pipeline(X, y, y_strings, c)
+        all_scores.append(scores)
 
     c = "audio"
     df_opensmile = pd.read_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data.csv"))
@@ -105,12 +114,10 @@ def main():
     print(y.shape)  # Number of rows in the target vector
     print(y_strings.shape)
 
-    val_mean_acc, val_std_acc = pipeline(X, y, y_strings, c)
-    scores = {"condition": c, "val_mean_acc": val_mean_acc, "val_std_acc": val_std_acc}
+    scores = pipeline(X, y, y_strings, c)
+    all_scores.append(scores)
 
-    acc_scores.append(scores)
-
-    df_scores = pd.DataFrame(acc_scores)
+    df_scores = pd.DataFrame(all_scores)
     print(df_scores)
 
 
