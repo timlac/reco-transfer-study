@@ -32,20 +32,20 @@ melted_var_df['Action Unit'] = melted_var_df['Action Unit'].str.replace('_var', 
 emotions = df['emotion'].unique()
 
 # Plotting mean intensities
-# for emotion in emotions:
-#     plt.figure(figsize=(10, 6))
-#     sns.barplot(data=melted_mean_df[melted_mean_df['emotion'] == emotion],
-#                 x='Action Unit',
-#                 y='Mean Intensity',
-#                 hue='condition')
-#     plt.title(f"Mean Action Unit Intensities for Emotion: {emotion}")
-#     plt.xticks(rotation=45, ha='right')
-#     plt.xlabel("Action Unit")
-#     plt.ylabel("Mean Intensity")
-#     plt.legend(title="Condition")
-#     plt.tight_layout()
-#     plt.savefig(f"mean_intensity_{emotion}.png")
-#     plt.show()
+for emotion in emotions:
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=melted_mean_df[melted_mean_df['emotion'] == emotion],
+                x='Action Unit',
+                y='Mean Intensity',
+                hue='condition')
+    plt.title(f"Mean Action Unit Intensities for Emotion: {emotion}")
+    plt.xticks(rotation=45, ha='right')
+    plt.xlabel("Action Unit")
+    plt.ylabel("Mean Intensity")
+    plt.legend(title="Condition")
+    plt.tight_layout()
+    plt.savefig(f"mean_intensity_{emotion}.png")
+    plt.show()
 
 # Plotting variances
 for emotion in emotions:

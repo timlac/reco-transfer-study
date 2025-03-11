@@ -12,7 +12,8 @@ from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 from constants import ROOT_DIR, opensmile_feature_columns
 from machine_learning.supervised_learning.evaluate.evaluate_scores import evaluate_scores
 from machine_learning.supervised_learning.parameter_search.svm_ps import param_search
-from machine_learning.supervised_learning.utils import save_parameters, load_parameters, get_features_openface
+from machine_learning.supervised_learning.utils import save_parameters, load_parameters, get_features_openface, \
+    accuracy_per_emotion
 from machine_learning.supervised_learning.visualizations.misc_plots import plot_conf_mat
 from machine_learning.utils import get_splits
 
@@ -42,7 +43,7 @@ def get_metrics(y, y_pred, condition=None):
     y_pred_strings = Mapper.get_emotion_from_id(y_pred)
 
     # plot confusion matrix
-    conf_mat = metrics.confusion_matrix(y_strings, y_pred_strings, labels=np.unique(y_strings))
+    conf_mat = metrics.confusion_matrix(y_strings, y_pred_strings, labels=np.unique(y_strings), normalize="true")
     plot_conf_mat(conf_mat, labels=np.unique(y_strings), condition=condition)
 
 
@@ -59,34 +60,33 @@ def train_external():
     y_train = df_merged["emotion_id"].values
 
     scores = []
+    results = []
 
     for feat in features:
         if feat == "audio":
             X_train = df_merged[opensmile_feature_columns].values
             clf, clf_proba = train_setup(X_train, y_train, feat, load_params=True)
-            s = test_multimodal(clf, clf_proba, video=False, audio=True)
-            scores.extend(s)
-
+            s, res = test_multimodal(clf, clf_proba, video=False, audio=True)
         elif feat == "video":
             X_train = get_features_openface(df_merged)
             clf, clf_proba = train_setup(X_train, y_train, feat, load_params=True)
-
-            s= test_multimodal(clf, clf_proba, video=True, audio=False)
-            scores.extend(s)
+            s, res = test_multimodal(clf, clf_proba, video=True, audio=False)
         else:
             X_train_openface = get_features_openface(df_merged)
             X_train_opensmile = df_merged[opensmile_feature_columns].values
             X_train = np.concatenate((X_train_openface, X_train_opensmile), axis=1)
-
             print("X shape in train:", X_train.shape)
-
             clf, clf_proba = train_setup(X_train, y_train, feat, load_params=True)
+            s, res =test_multimodal(clf, clf_proba, video=True, audio=True)
 
-            s=test_multimodal(clf, clf_proba, video=True, audio=True)
-            scores.extend(s)
+        scores.extend(s)
+        results.extend(res)
 
     scores_df = pd.DataFrame(scores)
     print(scores_df)
+
+    results_df = pd.concat(results)
+    results_df.to_csv(os.path.join(ROOT_DIR, "data/out/multimodal_results.csv"), index=False)
 
 def train_setup(X, y, feature_type, load_params=False):
     scaler = StandardScaler()
@@ -123,6 +123,8 @@ def test_multimodal(clf, clf_proba, video=True, audio=False):
 
     all_scores = []
 
+    results = []
+
     for condition in conditions:
         df = df_merged[df_merged["condition"] == condition]
 
@@ -148,18 +150,26 @@ def test_multimodal(clf, clf_proba, video=True, audio=False):
 
         y_pred = clf.predict(X)
 
+        df_results = pd.DataFrame({"condition": condition + "_" + audio*"audio_" + video*"video",
+                                   "y": y, "y_pred": y_pred})
+        results.append(df_results)
+
         acc = accuracy_score(y, y_pred)
         f1_score = metrics.f1_score(y, y_pred, average="macro")
         roc_auc_ovr = metrics.roc_auc_score(y, clf_proba.predict_proba(X), multi_class="ovr")
 
-        get_metrics(y, y_pred, condition=condition)
+        metric_string = condition + " " + audio*"audio_" + video*"video"
+
+        get_metrics(y, y_pred, condition=metric_string)
 
         scores = {"condition": condition, "accuracy": acc, "f1_score": f1_score, "roc_auc_ovr": roc_auc_ovr,
                   "video": video, "audio": audio}
 
         all_scores.append(scores)
 
-    return all_scores
+
+
+    return all_scores, results
 
 
 if __name__ == '__main__':

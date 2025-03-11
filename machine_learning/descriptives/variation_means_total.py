@@ -29,3 +29,18 @@ plt.xlabel("Feature")
 plt.legend(title="Condition")
 plt.tight_layout()
 plt.show()
+
+
+# Compute variance for each feature within each condition
+mean_df = df.groupby('condition')[mean_cols].mean().T
+
+# Plot the variance for each condition
+plt.figure(figsize=(12, 6))
+mean_df.plot(kind='bar', figsize=(15, 6))
+plt.xticks(rotation=45, ha='right')
+plt.title("Feature Mean per Condition")
+plt.ylabel("Mean")
+plt.xlabel("Feature")
+plt.legend(title="Condition")
+plt.tight_layout()
+plt.show()
