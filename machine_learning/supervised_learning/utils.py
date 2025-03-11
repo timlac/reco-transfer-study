@@ -3,17 +3,21 @@ import json
 
 from constants import ROOT_DIR, openface_feature_columns
 
-parameter_path = os.path.join(ROOT_DIR, "data/out", "best_params.json")
-
 def save_parameters(best_params, appendage=""):
     # Save best parameters to file
-    with open(parameter_path + appendage, "w") as f:
+
+    parameter_path = os.path.join(ROOT_DIR, "data/out", "best_params_" + appendage + ".json")
+
+    with open(parameter_path, "w") as f:
         json.dump(best_params, f)
 
 
 def load_parameters(appendage=""):
+
+    parameter_path = os.path.join(ROOT_DIR, "data/out", "best_params_" + appendage + ".json")
+
     # Load best parameters from file
-    with open(parameter_path + appendage, "r") as f:
+    with open(parameter_path, "r") as f:
         best_params = json.load(f)
 
     return best_params

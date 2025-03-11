@@ -50,24 +50,58 @@ def train_external():
     df_external_openface = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data_external.csv"))
     df_external_opensmile = pd.read_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data_external.csv"))
 
-    X_train_openface = get_features_openface(df_external_openface)
-    X_train_opensmile = df_external_opensmile[opensmile_feature_columns].values
+    df_merged = pd.merge(df_external_openface, df_external_opensmile, on=["filename", "emotion_id", "video_id"], how="inner")
 
+    print(df_merged.isnull())
+
+    features = ["audio", "video", "multimodal"]
+
+    y_train = df_merged["emotion_id"].values
+
+    scores = []
+
+    for feat in features:
+        if feat == "audio":
+            X_train = df_merged[opensmile_feature_columns].values
+            clf, clf_proba = train_setup(X_train, y_train, feat, load_params=True)
+            s = test_multimodal(clf, clf_proba, video=False, audio=True)
+            scores.extend(s)
+
+        elif feat == "video":
+            X_train = get_features_openface(df_merged)
+            clf, clf_proba = train_setup(X_train, y_train, feat, load_params=True)
+
+            s= test_multimodal(clf, clf_proba, video=True, audio=False)
+            scores.extend(s)
+        else:
+            X_train_openface = get_features_openface(df_merged)
+            X_train_opensmile = df_merged[opensmile_feature_columns].values
+            X_train = np.concatenate((X_train_openface, X_train_opensmile), axis=1)
+
+            print("X shape in train:", X_train.shape)
+
+            clf, clf_proba = train_setup(X_train, y_train, feat, load_params=True)
+
+            s=test_multimodal(clf, clf_proba, video=True, audio=True)
+            scores.extend(s)
+
+    scores_df = pd.DataFrame(scores)
+    print(scores_df)
 
 def train_setup(X, y, feature_type, load_params=False):
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
     if load_params:
-        best_params = load_parameters()
+        best_params = load_parameters(feature_type)
     else:
-        gs = param_search(X, y, "accuracy")
-        save_parameters(gs.best_params_)
+        gs = param_search(X, y, "accuracy", mock=False)
+        save_parameters(gs.best_params_, feature_type)
         best_params = gs.best_params_
 
     # Evaluate the model on the training data
-    y_pred = n_fold_cross_validation(best_params, X_train, y_train)
-    get_metrics(y, y_pred, condition="external")
+    # y_pred = n_fold_cross_validation(best_params, X, y)
+    # get_metrics(y, y_pred, condition=feature_type)
 
     # train the model
     clf = SVC(**best_params)
@@ -76,92 +110,58 @@ def train_setup(X, y, feature_type, load_params=False):
     clf_proba = SVC(**best_params, probability=True)
     clf_proba.fit(X, y)
 
+    return clf, clf_proba
 
 
+def test_multimodal(clf, clf_proba, video=True, audio=False):
+    df_openface = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"))
+    df_opensmile = pd.read_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data.csv"))
 
+    df_merged = pd.merge(df_openface, df_opensmile, on=["filename", "emotion_id", "video_id"], how="inner")
 
-
-
-
-
-def main():
-
-    # TODO: Do the corresponding implementation for audio and audio + video for each condition (furhat, metahuman, original)
-
-    df_external = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data_external.csv"))
-    df_conditions = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"))
     conditions = ["furhat", "metahuman", "original"]
 
-    load_params = False
-
-    print(df_external.isnull())
-    nan_rows = df_external[df_external.isnull().T.any()]
-    print(nan_rows)
-    print(df_external.shape)
-
-    X_train = get_features_openface(df_external)
-
-    y_train = df_external["emotion_id"].values
-
-    video_ids = df_external["video_id"].values
-
-    print(X_train.shape)  # Number of rows and columns in the feature matrix
-    print(y_train.shape)  # Number of rows in the target vector
-
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-
-    if load_params:
-        best_params = load_parameters()
-    else:
-        gs = param_search(X_train, y_train, "accuracy")
-        save_parameters(gs.best_params_)
-        best_params = gs.best_params_
-
-
-    # Evaluate the model on the training data
-    y_pred = n_fold_cross_validation(best_params, X_train, y_train)
-    get_metrics(y_train, y_pred, condition="external")
-
-    # train the model
-    clf = SVC(**best_params)
-    clf.fit(X_train, y_train)
-
-    clf_proba = SVC(**best_params, probability=True)
-    clf_proba.fit(X_train, y_train)
-
-    # Evaluate model on test data in different conditions
     all_scores = []
-    for c in conditions:
-        print("\nEvaluating for condition:", c)
 
-        df = df_conditions[df_conditions["condition"] == c]
+    for condition in conditions:
+        df = df_merged[df_merged["condition"] == condition]
 
-        X_test = get_features_openface(df)
+        if video and audio:
+            print("Video and audio")
+            X_openface = get_features_openface(df)
+            X_opensmile = df[opensmile_feature_columns].values
+            X = np.concatenate((X_openface, X_opensmile), axis=1)
+        elif video:
+            print("Video")
+            X = get_features_openface(df)
+        elif audio:
+            print("Audio")
+            X = df[opensmile_feature_columns].values
+        else:
+            raise ValueError("Please select either video or audio or both.")
 
-        y_test = df["emotion_id"].values
+        X = StandardScaler().fit_transform(X)
 
-        print(X_test.shape)  # Number of rows and columns in the feature matrix
-        print(y_test.shape)  # Number of rows in the target vector
+        print("X shape in test:", X.shape)
 
-        X_test = StandardScaler().fit_transform(X_test)
-        y_pred = clf.predict(X_test)
+        y = df["emotion_id"].values
 
-        acc = accuracy_score(y_test, y_pred)
-        f1_score = metrics.f1_score(y_test, y_pred, average="macro")
-        roc_auc_ovr = metrics.roc_auc_score(y_test, clf_proba.predict_proba(X_test), multi_class="ovr")
+        y_pred = clf.predict(X)
 
-        get_metrics(y_test, y_pred, condition=c)
+        acc = accuracy_score(y, y_pred)
+        f1_score = metrics.f1_score(y, y_pred, average="macro")
+        roc_auc_ovr = metrics.roc_auc_score(y, clf_proba.predict_proba(X), multi_class="ovr")
 
-        scores = {"condition": c, "accuracy": acc, "f1_score": f1_score, "roc_auc_ovr": roc_auc_ovr}
+        get_metrics(y, y_pred, condition=condition)
+
+        scores = {"condition": condition, "accuracy": acc, "f1_score": f1_score, "roc_auc_ovr": roc_auc_ovr,
+                  "video": video, "audio": audio}
 
         all_scores.append(scores)
 
-    df_scores = pd.DataFrame(all_scores)
-    print(df_scores)
-
+    return all_scores
 
 
 if __name__ == '__main__':
-    main()
+    train_external()
     # pipeline(X, y, y_strings)
