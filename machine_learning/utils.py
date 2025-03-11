@@ -29,3 +29,21 @@ def get_splits(x, y):
     return skf.split(x, y)
 
 
+def main():
+    groups = np.array(['A205', 'A323', 'A207', 'A67', 'A426', 'A407', 'A303', 'A227', 'A200', 'A417', 'A207', 'A207', 'A424', 'A417',
+     'A437', 'A205', 'A334', 'A426', 'A424', 'A102', 'A332', 'A323', 'A102', 'A334', 'A425', 'A435', 'A424', 'A337',
+     'A72', 'A426', 'A417', 'A417', 'A332', 'A426', 'A200', 'A207', 'A67', 'A426', 'A67', 'A220', 'A438', 'A227',
+     'A221', 'A220', 'A67', 'A91', 'A405', 'A303', 'A417', 'A72', 'A220', 'A426', 'A417', 'A435', 'A67', 'A424', 'A205',
+     'A327', 'A438', 'A426', 'A417', 'A102', 'A435', 'A67'])
+
+    print(np.where(groups == 'A205')[0])
+
+    for group in np.unique(groups):
+        print(f"\ngroup:  {group}")
+
+        rows = np.where(groups == group)[0]
+
+        print(rows)
+
+if __name__ == "__main__":
+    main()

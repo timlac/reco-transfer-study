@@ -7,6 +7,8 @@ import tensorflow as tf
 from tensorboard.plugins import projector
 from sklearn.preprocessing import StandardScaler
 
+from machine_learning.utils import functional_scale_by
+
 openface_path = os.path.join(ROOT_DIR, "data/out/openface_data.csv")
 
 log_dir = "projector_logs"
@@ -15,7 +17,7 @@ tensor_filename = "tensor.tsv"
 
 df = pd.read_csv(openface_path)
 
-df = df[df["condition"] == "metahuman"]
+df = df[df["condition"] == "original"]
 
 meta = df[["condition",
            "filename",
@@ -24,16 +26,20 @@ meta = df[["condition",
            "intensity_level",
            "mode"]]
 
-vec = df.loc[:, df.columns.str.contains('mean')]
+vec = df.loc[:, df.columns.str.contains('mean')].values
 
 # Normalize the vectors
-scaler = StandardScaler()
-vec_normalized = scaler.fit_transform(vec)
+# scaler = StandardScaler()
+# vec_normalized = scaler.fit_transform(vec)
+
+# Normalize the vectors
+video_ids = df["video_id"].values
+vec_normalized = functional_scale_by(vec, video_ids, "standard")
 
 
-print(vec.shape)  # Number of rows and columns in tensor
-print(vec.isna().sum())
-print(meta.shape)  # Number of rows and columns in metadata
+# print(vec.shape)  # Number of rows and columns in tensor
+# print(vec.isna().sum())
+# print(meta.shape)  # Number of rows and columns in metadata
 
 meta.to_csv(os.path.join(log_dir, metadata_filename),
             sep='\t', index=False)

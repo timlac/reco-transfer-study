@@ -6,16 +6,15 @@ from sklearn import metrics
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 import os
-import json
 
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 
-from constants import openface_feature_columns, opensmile_feature_columns, ROOT_DIR
+from constants import ROOT_DIR, opensmile_feature_columns
 from machine_learning.supervised_learning.evaluate.evaluate_scores import evaluate_scores
 from machine_learning.supervised_learning.parameter_search.svm_ps import param_search
-from machine_learning.supervised_learning.utils import save_parameters, load_parameters
+from machine_learning.supervised_learning.utils import save_parameters, load_parameters, get_features_openface
 from machine_learning.supervised_learning.visualizations.misc_plots import plot_conf_mat
-from machine_learning.utils import get_splits, functional_scale_by
+from machine_learning.utils import get_splits
 
 
 def n_fold_cross_validation(best_params, X, y):
@@ -47,24 +46,60 @@ def get_metrics(y, y_pred, condition=None):
     plot_conf_mat(conf_mat, labels=np.unique(y_strings), condition=condition)
 
 
-def get_x(df):
-    cols = df.loc[:, df.columns.str.contains('|'.join(openface_feature_columns))].columns
-    return df[cols].values
+def train_external():
+    df_external_openface = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data_external.csv"))
+    df_external_opensmile = pd.read_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data_external.csv"))
+
+    X_train_openface = get_features_openface(df_external_openface)
+    X_train_opensmile = df_external_opensmile[opensmile_feature_columns].values
+
+
+def train_setup(X, y, feature_type, load_params=False):
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    if load_params:
+        best_params = load_parameters()
+    else:
+        gs = param_search(X, y, "accuracy")
+        save_parameters(gs.best_params_)
+        best_params = gs.best_params_
+
+    # Evaluate the model on the training data
+    y_pred = n_fold_cross_validation(best_params, X_train, y_train)
+    get_metrics(y, y_pred, condition="external")
+
+    # train the model
+    clf = SVC(**best_params)
+    clf.fit(X, y)
+
+    clf_proba = SVC(**best_params, probability=True)
+    clf_proba.fit(X, y)
+
+
+
+
+
+
+
 
 
 def main():
+
+    # TODO: Do the corresponding implementation for audio and audio + video for each condition (furhat, metahuman, original)
+
     df_external = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data_external.csv"))
     df_conditions = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"))
     conditions = ["furhat", "metahuman", "original"]
 
-    load_params = True
+    load_params = False
 
     print(df_external.isnull())
     nan_rows = df_external[df_external.isnull().T.any()]
     print(nan_rows)
     print(df_external.shape)
 
-    X_train = get_x(df_external)
+    X_train = get_features_openface(df_external)
 
     y_train = df_external["emotion_id"].values
 
@@ -102,7 +137,7 @@ def main():
 
         df = df_conditions[df_conditions["condition"] == c]
 
-        X_test = get_x(df)
+        X_test = get_features_openface(df)
 
         y_test = df["emotion_id"].values
 
@@ -124,7 +159,6 @@ def main():
 
     df_scores = pd.DataFrame(all_scores)
     print(df_scores)
-
 
 
 

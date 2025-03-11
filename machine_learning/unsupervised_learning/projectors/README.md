@@ -8,11 +8,18 @@
 
 # Observations 
 
-Using T-SNE, we can see some clusters based on emotions, e.g. `interest_curiosity` and `gratitude`. 
-But also clear actor specific clusters. 
+Without group normalization we see clear actor specific clusters. 
 
-PCA likewise clusters actors rather than emotions. Although there seems to be somewhat of a pattern, where positive emotions
-tend towards one side of axis. 
+For the internal data it is difficult to see any emotion specific clusters.
 
-**TODO:** Try to use actor specific normalization, either low level normalization, or functional normalization of the items.
+# Plots
 
+## PCA internal Conditions 
+
+![PCA Conditions](../../../data/plots/PCA_conditions.png)
+
+## T-SNE external emotions
+
+Using T-SNE, we can see some clusters based on emotions, e.g. `interest_curiosity` and `gratitude`.
+
+![T-SNE External](../../../data/plots/TSNE_external.png)

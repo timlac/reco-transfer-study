@@ -11,13 +11,13 @@ from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 from constants import openface_feature_columns, opensmile_feature_columns, ROOT_DIR
 from machine_learning.supervised_learning.evaluate.evaluate_scores import evaluate_scores
 from machine_learning.supervised_learning.parameter_search.svm_ps import param_search
+from machine_learning.supervised_learning.svm_pipeline_big import n_fold_cross_validation, get_metrics
+from machine_learning.supervised_learning.utils import get_features_openface
 from machine_learning.supervised_learning.visualizations.misc_plots import plot_conf_mat
 from machine_learning.utils import get_splits
 
-# TODO: Metahuman has basically chance level accuracy, need to investigate why
 
-
-def pipeline(X, y , y_strings, condition):
+def pipeline(X, y, condition):
 
     print(np.unique(y))
 
@@ -44,6 +44,7 @@ def pipeline(X, y , y_strings, condition):
     splits = get_splits(X, y)
     y_pred = cross_val_predict(svc, X, y, cv=splits, n_jobs=-1)
 
+    y_strings = Mapper.get_emotion_from_id(y)
     y_pred_strings = Mapper.get_emotion_from_id(y_pred)
 
     # get classification report based on predictions
@@ -69,7 +70,39 @@ def pipeline(X, y , y_strings, condition):
     return scores
 
 
-def main():
+def train_eval_conditions_together():
+    df_openface = pd.read_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"))
+    print(df_openface.shape)
+
+    conditions = ["furhat", "metahuman", "original"]
+
+    X = get_features_openface(df_openface)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    y = df_openface["emotion_id"].values
+
+    gs = param_search(X, y, "accuracy")
+    best_params = gs.best_params_
+
+    for c in conditions:
+        print("\nRunning for condition:", c)
+
+        df = df_openface[df_openface["condition"] == c]
+
+        X_c = get_features_openface(df)
+        X_c = scaler.transform(X_c)
+
+        y_c = df["emotion_id"].values
+
+        y_pred = n_fold_cross_validation(best_params, X_c, y_c)
+        get_metrics(y_c, y_pred, condition=c)
+
+
+
+
+
+def train_eval_conditions_separately():
     # TODO: try training everything together and evaluate separately
 
     all_scores = []
@@ -84,18 +117,9 @@ def main():
 
         df = df_openface[df_openface["condition"] == c]
 
-        cols = df.loc[:, df.columns.str.contains('|'.join(openface_feature_columns))].columns
-        print(cols)
-
-        # X = df.loc[:, df.columns.str.contains('mean')].values
-
-        X = df.loc[:, df.columns.str.contains('|'.join(openface_feature_columns))].values
+        X = get_features_openface(df)
         y = df["emotion_id"].values
         y_strings = df["emotion"].values
-
-        print(X.shape)  # Number of rows and columns in the feature matrix
-        print(y.shape)  # Number of rows in the target vector
-        print(y_strings.shape)
 
         scores = pipeline(X, y, y_strings, c)
         all_scores.append(scores)
@@ -110,10 +134,6 @@ def main():
     y = df_opensmile["emotion_id"].values
     y_strings = df_opensmile["emotion"].values
 
-    print(X.shape)  # Number of rows and columns in the feature matrix
-    print(y.shape)  # Number of rows in the target vector
-    print(y_strings.shape)
-
     scores = pipeline(X, y, y_strings, c)
     all_scores.append(scores)
 
@@ -122,5 +142,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # train_eval_conditions_separately()
+    train_eval_conditions_together()
     # pipeline(X, y, y_strings)
