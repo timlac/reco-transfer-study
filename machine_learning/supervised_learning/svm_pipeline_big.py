@@ -4,7 +4,7 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.svm import SVC
 from sklearn import metrics
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import os
 
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
@@ -129,22 +129,22 @@ def test_multimodal(clf, clf_proba, video=True, audio=False):
         df = df_merged[df_merged["condition"] == condition]
 
         if video and audio:
-            print("Video and audio")
+            print("Video and audio " + condition)
             X_openface = get_features_openface(df)
             X_opensmile = df[opensmile_feature_columns].values
             X = np.concatenate((X_openface, X_opensmile), axis=1)
         elif video:
-            print("Video")
+            print("Video " + condition)
             X = get_features_openface(df)
         elif audio:
-            print("Audio")
+            print("Audio " + condition)
             X = df[opensmile_feature_columns].values
         else:
             raise ValueError("Please select either video or audio or both.")
 
         X = StandardScaler().fit_transform(X)
 
-        print("X shape in test:", X.shape)
+        # print("X shape in test:", X.shape)
 
         y = df["emotion_id"].values
 

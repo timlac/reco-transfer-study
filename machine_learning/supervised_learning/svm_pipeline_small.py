@@ -1,9 +1,10 @@
 import pandas as pd
+import sklearn.metrics
 from sklearn.model_selection import cross_val_predict
 from sklearn.svm import SVC
 from sklearn import metrics
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import os
 
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
@@ -14,7 +15,7 @@ from machine_learning.supervised_learning.parameter_search.svm_ps import param_s
 from machine_learning.supervised_learning.svm_pipeline_big import n_fold_cross_validation, get_metrics
 from machine_learning.supervised_learning.utils import get_features_openface
 from machine_learning.supervised_learning.visualizations.misc_plots import plot_conf_mat
-from machine_learning.utils import get_splits
+from machine_learning.utils import get_splits, functional_scale_by
 
 
 def pipeline(X, y, condition):
@@ -77,6 +78,9 @@ def train_eval_conditions_together():
     conditions = ["furhat", "metahuman", "original"]
 
     X = get_features_openface(df_openface)
+
+    # X = functional_scale_by(X, df_openface["video_id"].values, "standard")
+
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
@@ -85,22 +89,27 @@ def train_eval_conditions_together():
     gs = param_search(X, y, "accuracy")
     best_params = gs.best_params_
 
+    svc = SVC(**best_params)
+
+    scores = pipeline(X, y, "all")
+
+    scores_df = pd.DataFrame(scores, index=[0])
+    print(scores_df)
+
+    y_pred = n_fold_cross_validation(best_params, X, y)
+
+    condition_vector = df_openface["condition"].values
+
     for c in conditions:
-        print("\nRunning for condition:", c)
+        idx = np.where(condition_vector == c)
+        y_pred_c = y_pred[idx]
+        y_c = y[idx]
 
-        df = df_openface[df_openface["condition"] == c]
-
-        X_c = get_features_openface(df)
-        X_c = scaler.transform(X_c)
-
-        y_c = df["emotion_id"].values
-
-        y_pred = n_fold_cross_validation(best_params, X_c, y_c)
-        get_metrics(y_c, y_pred, condition=c)
-
-
-
-
+        print("\nCondition:", c)
+        print("y_pred_c shape:", y_pred_c.shape)
+        print("y_c shape:", y_c.shape)
+        acc = metrics.accuracy_score(y_c, y_pred_c)
+        print("Accuracy:", acc)
 
 def train_eval_conditions_separately():
     # TODO: try training everything together and evaluate separately
@@ -119,9 +128,8 @@ def train_eval_conditions_separately():
 
         X = get_features_openface(df)
         y = df["emotion_id"].values
-        y_strings = df["emotion"].values
 
-        scores = pipeline(X, y, y_strings, c)
+        scores = pipeline(X, y, c)
         all_scores.append(scores)
 
     c = "audio"
@@ -132,9 +140,8 @@ def train_eval_conditions_separately():
 
     X = df_opensmile[opensmile_feature_columns].values
     y = df_opensmile["emotion_id"].values
-    y_strings = df_opensmile["emotion"].values
 
-    scores = pipeline(X, y, y_strings, c)
+    scores = pipeline(X, y, c)
     all_scores.append(scores)
 
     df_scores = pd.DataFrame(all_scores)

@@ -30,6 +30,14 @@ It could also be interesting to train a model on more data in the original condi
 on the different conditions. We will most likely get much better results on the original condition, but we can argue that
 humans have similar "training".
 
+
+### Observations 
+
+All models trained on the transfer data so far seems to produce very high variance, e.g. the results vary widely between different runs.
+This likely stems from overfitting, it may be worth to try a heavily regularized logistic regression model or similar. 
+
+Training on external data gives stable results, comparable to human raters. 
+
 ### Objectives 
 
 - Compare the performance of the models on the different conditions.

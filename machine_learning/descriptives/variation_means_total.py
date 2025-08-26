@@ -20,7 +20,6 @@ df[mean_cols] = scaler.fit_transform(df[mean_cols])
 variance_df = df.groupby('condition')[mean_cols].var().T
 
 # Plot the variance for each condition
-plt.figure(figsize=(12, 6))
 variance_df.plot(kind='bar', figsize=(15, 6))
 plt.xticks(rotation=45, ha='right')
 plt.title("Feature Variance per Condition")
@@ -35,7 +34,6 @@ plt.show()
 mean_df = df.groupby('condition')[mean_cols].mean().T
 
 # Plot the variance for each condition
-plt.figure(figsize=(12, 6))
 mean_df.plot(kind='bar', figsize=(15, 6))
 plt.xticks(rotation=45, ha='right')
 plt.title("Feature Mean per Condition")
