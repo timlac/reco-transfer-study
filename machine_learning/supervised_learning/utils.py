@@ -2,7 +2,8 @@ import os
 import json
 import numpy as np
 
-from constants import ROOT_DIR, openface_feature_columns
+from constants import ROOT_DIR, openface_feature_columns, openface_3_feature_columns
+
 
 def save_parameters(best_params, appendage=""):
     # Save best parameters to file
@@ -30,6 +31,14 @@ def get_features_openface(df, only_means=False):
         return df[cols].values
     else:
         cols = df.loc[:, df.columns.str.contains('|'.join(openface_feature_columns))].columns
+        return df[cols].values
+
+def get_features_openface_3(df, only_means=False):
+    if only_means:
+        cols = df.loc[:, df.columns.str.contains("mean")].columns
+        return df[cols].values
+    else:
+        cols = df.loc[:, df.columns.str.contains('|'.join(openface_3_feature_columns))].columns
         return df[cols].values
 
 

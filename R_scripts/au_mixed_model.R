@@ -18,14 +18,14 @@ df$AU        <- factor(df$AU)
 df$condition <- relevel(df$condition, ref = "original")
 
 # ==== Mixed model ====
-# m1 <- lmer(activation ~ condition + (1 | video_id) + (1 | AU) + (1 | emotion),
-#            data = df, REML = FALSE)
-#
-# summary(m1)    # fixed effects estimates
-# anova(m1)      # test of condition effect
+m1 <- lmer(activation ~ condition + (1 | video_id) + (1 | AU) + (1 | emotion),
+           data = df, REML = FALSE)
+
+summary(m1)    # fixed effects estimates
+anova(m1)      # test of condition effect
 
 # ==== Post-hoc (if condition significant) ====
-# emmeans(m1, pairwise ~ condition, adjust = "tukey")
+emmeans(m1, pairwise ~ condition, adjust = "tukey")
 #
 # m2 <- lmer(activation ~ condition + (1|video_id) + (1 + condition | AU) + (1|emotion),
 #            data = df, REML = FALSE)
@@ -36,12 +36,12 @@ df$condition <- relevel(df$condition, ref = "original")
 # # ==== Post-hoc (if condition significant) ====
 # emmeans(m2, pairwise ~ condition, adjust = "tukey")
 
-
-m3 <- lmer(activation ~ condition * AU + (1|video_id) + (1|emotion),
-           data = df, REML = FALSE)
-
-summary(m3)    # fixed effects estimates
-anova(m3)      # test of condition effect
+#
+# m3 <- lmer(activation ~ condition * AU + (1|video_id) + (1|emotion),
+#            data = df, REML = FALSE)
+#
+# summary(m3)    # fixed effects estimates
+# anova(m3)      # test of condition effect
 
 
 

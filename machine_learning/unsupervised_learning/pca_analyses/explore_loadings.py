@@ -78,7 +78,7 @@ for i, cond in enumerate(unique_conds):
 plt.xlabel(f"PC1 ({expl_var[0]:.1f}%)")
 plt.ylabel(f"PC2 ({expl_var[1]:.1f}%)")
 # plt.title(f"PCA scores by embodiment ({FAMILY} features)")
-plt.title(f"PCA scores by embodiment")
+# plt.title(f"PCA scores by embodiment")
 
 plt.grid(True, linestyle="--", alpha=0.3)
 plt.legend(loc="best", fontsize=12)

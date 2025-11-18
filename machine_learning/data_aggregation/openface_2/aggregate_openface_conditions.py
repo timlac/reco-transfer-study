@@ -60,4 +60,4 @@ df = pd.DataFrame(data)
 print(df["emotion"].unique())
 
 # Save the DataFrame to a CSV file
-df.to_csv(os.path.join("data/out/openface_data.csv"), index=False)
+df.to_csv(os.path.join(ROOT_DIR, "data/out/openface_data.csv"), index=False)
