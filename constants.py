@@ -113,6 +113,28 @@ opensmile_feature_columns = ['F0semitoneFrom27.5Hz_sma3nz_amean',
                              'MeanUnvoicedSegmentLength', 'StddevUnvoicedSegmentLength',
                              'equivalentSoundLevel_dBp']
 
+
+au_brief_names = {
+    'AU01_r': 'AU01 – Inner brow raiser',
+    'AU02_r': 'AU02 – Outer brow raiser',
+    'AU04_r': 'AU04 – Brow lowerer',
+    'AU05_r': 'AU05 – Upper lid raiser',
+    'AU06_r': 'AU06 – Cheek raiser',
+    'AU07_r': 'AU07 – Lid tightener',
+    'AU09_r': 'AU09 – Nose wrinkler',
+    'AU10_r': 'AU10 – Upper lip raiser',
+    'AU12_r': 'AU12 – Lip corner puller',
+    'AU14_r': 'AU14 – Dimpler',
+    'AU15_r': 'AU15 – Lip corner depressor',
+    'AU17_r': 'AU17 – Chin raiser',
+    'AU20_r': 'AU20 – Lip stretcher',
+    'AU23_r': 'AU23 – Lip tightener',
+    'AU25_r': 'AU25 – Lips part',
+    'AU26_r': 'AU26 – Jaw drop',
+    'AU45_r': 'AU45 – Blink'
+}
+
+
 var_name_to_feat = {
     # Frequency features
     'F0semitoneFrom27.5Hz_sma3nz_amean': 'F0 M',
@@ -217,7 +239,7 @@ var_name_to_feat = {
     'AU02_r_percentile80.0': 'AU02 (outer brow raiser) P80',
     'AU02_r_iqr60_80-20': 'AU02 (outer brow raiser) P range',
     'AU02_r_numPeaks': 'AU02 (outer brow raiser) N peaks',
-    'AU04_r_mean': 'AU04 (brow lowerer) M',
+    'AU04_r_mean': 'AU04 (brow lowerer)',
     'AU04_r_stddevNorm': 'AU04 (brow lowerer) CV',
     'AU04_r_percentile20.0': 'AU04 (brow lowerer) P20',
     'AU04_r_percentile50.0': 'AU04 (brow lowerer) P50',
@@ -259,7 +281,7 @@ var_name_to_feat = {
     'AU10_r_percentile80.0': 'AU10 (upper lip raiser) P80',
     'AU10_r_iqr60_80-20': 'AU10 (upper lip raiser) P range',
     'AU10_r_numPeaks': 'AU10 (upper lip raiser) N peaks',
-    'AU12_r_mean': 'AU12 (lip corner puller) M',
+    'AU12_r_mean': 'AU12 (lip corner puller)',
     'AU12_r_stddevNorm': 'AU12 (lip corner puller) CV',
     'AU12_r_percentile20.0': 'AU12 (lip corner puller) P20',
     'AU12_r_percentile50.0': 'AU12 (lip corner puller) P50',

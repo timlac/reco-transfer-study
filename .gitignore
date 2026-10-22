@@ -1,6 +1,11 @@
 data/
 machine_learning/unsupervised_learning/tf_projector/projector_logs/
 
+arkit_openface_gaze_validation/results/
+arkit_openface_gaze_validation/gaze_correction_results/
+arkit_openface_gaze_validation/gaze_correction_results_residual_lag/
+arkit_openface_gaze_validation/head_pose_results/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

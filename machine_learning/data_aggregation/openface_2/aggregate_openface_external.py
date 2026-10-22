@@ -10,7 +10,7 @@ from machine_learning.data_aggregation.utils import update_row
 
 Mapper._load_data_if_needed()
 
-data_folder = Path("/media/tim/Seagate Hub/transfer_study_openface_files/")
+data_folder = Path("/run/media/tim/tims_partition_e/transfer_study/selected_emotions_openface/")
 
 data = []
 
@@ -64,4 +64,4 @@ df = pd.DataFrame(data)
 print(df["emotion"].unique())
 
 # Save the DataFrame to a CSV file
-df.to_csv(os.path.join(ROOT_DIR, "data/out/openface_data_external.csv"), index=False)
+df.to_csv(os.path.join(ROOT_DIR, "data/out/openface_data_external_new.csv"), index=False)

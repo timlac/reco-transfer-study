@@ -7,7 +7,7 @@ from nexa_sentimotion_filename_parser.metadata import Metadata
 
 from constants import ROOT_DIR
 
-data_folder = Path("/media/tim/Seagate Hub/transfer_study_opensmile_files/")
+data_folder = Path("/run/media/tim/tims_partition_e/transfer_study/selected_emotions_opensmile/")
 
 df_list = []  # List to store individual DataFrames
 
@@ -34,6 +34,9 @@ for fp in data_folder.glob('*.csv'):
 # Concatenate all DataFrames
 final_df = pd.concat(df_list, ignore_index=True)
 
-final_df.to_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data_external.csv"), index=False)
+final_df.to_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data_external_new.csv"), index=False)
 
+old_df = pd.read_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data_external.csv"))
 
+old_and_new_df = pd.concat([old_df, final_df], ignore_index=True)
+old_and_new_df.to_csv(os.path.join(ROOT_DIR, "data/out/opensmile_data_external_old_and_new.csv"), index=False)
