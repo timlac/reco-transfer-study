@@ -12,7 +12,7 @@ from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 from constants import openface_feature_columns, opensmile_feature_columns, ROOT_DIR
 from machine_learning.supervised_learning.evaluate.evaluate_scores import evaluate_scores
 from machine_learning.supervised_learning.parameter_search.svm_ps import param_search
-from machine_learning.supervised_learning.svm_pipeline_big import n_fold_cross_validation, get_metrics
+from machine_learning.supervised_learning.svm_pipeline_external_train import n_fold_cross_validation, get_metrics
 from machine_learning.supervised_learning.utils import get_features_openface
 from machine_learning.supervised_learning.visualizations.misc_plots import plot_conf_mat
 from machine_learning.utils import get_splits, functional_scale_by

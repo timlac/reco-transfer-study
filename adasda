@@ -1,0 +1,22 @@
+ .gitignore                                                                                 |    5 [32m+[m
+ arkit_openface_gaze_validation/gaze_correction_results/SUMMARY.md                          |   25 [31m-[m
+ arkit_openface_gaze_validation/gaze_correction_results/clip_level_metrics.csv              | 1153 [31m-------------------------[m
+ arkit_openface_gaze_validation/gaze_correction_results/summary_metrics.csv                 |   19 [31m-[m
+ arkit_openface_gaze_validation/gaze_correction_results_residual_lag/SUMMARY.md             |   25 [31m-[m
+ arkit_openface_gaze_validation/gaze_correction_results_residual_lag/clip_level_metrics.csv | 1153 [31m-------------------------[m
+ arkit_openface_gaze_validation/gaze_correction_results_residual_lag/summary_metrics.csv    |   19 [31m-[m
+ arkit_openface_gaze_validation/head_pose_results/SUMMARY.md                                |   46 [31m-[m
+ arkit_openface_gaze_validation/head_pose_results/clip_level_head_pose_metrics.csv          | 1153 [31m-------------------------[m
+ arkit_openface_gaze_validation/head_pose_results/cross_validated_lags.csv                  |   76 [31m--[m
+ arkit_openface_gaze_validation/head_pose_results/head_pose_summary_metrics.csv             |   55 [31m--[m
+ arkit_openface_gaze_validation/head_pose_results/lag_alignment_scores.csv                  | 9793 [31m----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------[m
+ arkit_openface_gaze_validation/results/SUMMARY.md                                          |   43 [31m-[m
+ arkit_openface_gaze_validation/results/clip_level_metrics.csv                              |  769 [31m-----------------[m
+ arkit_openface_gaze_validation/results/data_quality_summary.csv                            |    4 [31m-[m
+ arkit_openface_gaze_validation/results/gaze_validation.png                                 |  Bin [31m335854[m -> [32m0[m bytes
+ arkit_openface_gaze_validation/results/gaze_validation.svg                                 | 3093 [31m------------------------------------------------------------------[m
+ arkit_openface_gaze_validation/results/manifest.csv                                        |  193 [31m-----[m
+ arkit_openface_gaze_validation/results/run_metadata.json                                   |    7 [31m-[m
+ arkit_openface_gaze_validation/results/summary_metrics.csv                                 |   41 [31m-[m
+ arkit_openface_gaze_validation/results/visual_alignment_lags.csv                           |    4 [31m-[m
+ 21 files changed, 5 insertions(+), 17671 deletions(-)
